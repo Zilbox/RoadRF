@@ -1,6 +1,34 @@
 import random
+import sqlite3
 import time
 import config
+
+# Создание соединения с бд
+def create_connection(db_file):
+    """ Создает соединение с базой данных SQLite. """
+    conn = None
+    try:
+        conn = sqlite3.connect(db_file)
+        return conn
+    except sqlite3.Error as e:
+        print(f"Ошибка при подключении к БД: {e}")
+    return conn
+
+# Случайный выбор игрока
+def player_choose():
+    database_file = "RF.db"  # Имя файла БД
+    conn = create_connection(database_file)
+    if conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT user_id FROM discord_members")
+        result = cursor.fetchone()
+        # Задаем зерно для рандома
+        random.seed(time.time())
+        # Перемешиваем набор событий
+        random.shuffle(result)
+        return f'<@{str(random.choice(result))}>'
+    else:
+        return ''
 
 LOCATION_NAMES_TEST = config.LOCATION_NAMES_TEST
 LOCATION_GROUP_NAMES = config.LOCATION_GROUP_NAMES
